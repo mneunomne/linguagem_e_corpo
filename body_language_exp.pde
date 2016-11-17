@@ -17,6 +17,10 @@ void setup() {
   positionsR = new ArrayList<PVector>();
 
   bg = loadImage("body.png");
+  
+}
+  
+  void draw() {
 
   background(0);
   int prevPosX;
@@ -27,8 +31,8 @@ void setup() {
   Point mouse;
   mouse = MouseInfo.getPointerInfo().getLocation();
 
-  //image(bg, 0, 0, mouse.x, mouse.y);
-  image(bg, 0, 0);
+  image(bg, 0, 0, mouse.x, mouse.y);
+  //image(bg, 0, 0);
 
   PVector pL;  
   PVector pR;
@@ -96,9 +100,10 @@ void setup() {
 
   float totalWritingSpace = 0;
   float currentWritingSpace =0;
+  float charWidthAverage;
 
   int charNum = 0;
-  int charLimit;
+  int charLimit = 0;
 
   String currentString = "";
 
@@ -131,34 +136,40 @@ void setup() {
     currentWritingSpace =0;
     totalWritingSpace += currentWritingSpace;
     currentWritingSpace = positionsR.get(i).x - positionsL.get(i).x;
+  //  println("currentWritingSpace: " + currentWritingSpace);
 
-    charLimit = charNum  + int(currentWritingSpace / (totalWritingSpace / s.length())) -1; 
+    charWidthAverage = textWidth(s) / s.length();
+   // println("charWidthAverage: " + charWidthAverage);
+
+    charLimit = min(charNum+int(currentWritingSpace / charWidthAverage), s.length()); 
+    //println("charLimit: " + charLimit);
+    //println("charNum: " + charNum);
 
     currentString = "";
 
     //calculate number of characters for the current width
 
     for (int j = charNum; j < charLimit; j++) {
-
+    //  println(j);
       char currentChar = s.charAt(j);
 
       if (textWidth(currentString) > currentWritingSpace) {
         fill(255, 200, 200);
-        text(currentString, positionsL.get(i).x, positionsL.get(i).y);
-        println("currentString: " + currentString);
+        currentString += str(currentChar);
       } else {       
         currentString += str(currentChar);
+   //     println("currentString: " + currentString);
       }
     }
-
-    charNum = charLimit;
-    if (charNum >= s.length()-2) {
-      charNum = 0;
-    }
-
+    fill(255);
+    text(currentString, positionsL.get(i).x, positionsL.get(i).y);
 
     //println("line width: " +  textWidth(currentString));
     //println("char number: " + charNum);
+    charNum += charLimit;
+    if (charNum >= s.length()-2) {
+      charNum = 0;
+    }
   }
   //println("totalWritingSpace: " + totalWritingSpace);
 }
