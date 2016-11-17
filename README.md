@@ -5,4 +5,4 @@ experimento em processing para formatar texto de maneira dinâmica em qualquer f
 
 processing experiment to format text in a dinamic way on any shape 
 
-* por Alberto Harres *
+_por Alberto Harres_
