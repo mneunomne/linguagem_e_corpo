@@ -1,3 +1,6 @@
+import java.awt.MouseInfo;
+import java.awt.Point;
+
 PImage bg; 
 int posY;
 int posX;
@@ -14,10 +17,6 @@ void setup() {
   positionsR = new ArrayList<PVector>();
 
   bg = loadImage("body.png");
-  int prevPosX;
-}
-
-void draw() {
 
   background(0);
   int prevPosX;
@@ -25,7 +24,17 @@ void draw() {
   positionsR.clear();
   positionsL.clear();
 
-  image(bg, mouseX, mouseY);
+  Point mouse;
+  mouse = MouseInfo.getPointerInfo().getLocation();
+
+  //image(bg, 0, 0, mouse.x, mouse.y);
+  image(bg, 0, 0);
+
+  PVector pL;  
+  PVector pR;
+
+  pR = new PVector(0, 0, 0);
+  pL = new PVector(0, 0, 0);
 
   posY=0;
   prevPosX=0;
@@ -37,11 +46,11 @@ void draw() {
       //run through all pixels
       int loc = x + y*width;
 
-      int nextLoc = min(x+1, width-1) + y*width;
+      int nextLoc = min(x+1, width) + y*width;
 
       //where body is 
-      if (y % 25 < 25/2) {
-        if (y % 25 == 0 ) {
+      if (y % 20 < 20/2) {
+        if (y % 20 == 0 ) {
           posY=0;
 
           if (brightness(pixels[loc]) > 10) {
@@ -51,20 +60,27 @@ void draw() {
           // pixels[loc] = color(255);
 
           if (posY == 1) {
-            pixels[loc] = color(255, 0, 0);
-            if (brightness(pixels[nextLoc]) < 10) {
-              posX = 0;
-              PVector p;
-              p = new PVector(x, y, 0);
-              positionsR.add(p);
-            }
+
+            // pixels[loc] = color(255, 0, 0);          
             // println("posX: " + posX); 
-            if (posX == 1) {            
-              PVector p;
-              p = new PVector(x, y, 0);
-              positionsL.add(p);
+            if (posX == 1) {      
+
+              pL = new PVector(x, y, 0);
+
               //  println(posX - prevPosX);
               //       pixels[loc] = color(0, 255, 0);
+            }
+            if (brightness(pixels[nextLoc]) < 10) {
+              pR = new PVector(x, y, 0);
+
+              //     if (pR.y != pL.y) {
+              //       println("unequal y");
+              //     }
+              if (pR.y == pL.y && posX > 5) {
+                positionsL.add(pL);
+                positionsR.add(pR);
+              }
+              posX = 0;
             }
             prevPosX = posX;
 
@@ -76,8 +92,16 @@ void draw() {
   }
   updatePixels();
 
+  float totalTextWidth = textWidth(s); 
+
   float totalWritingSpace = 0;
+  float currentWritingSpace =0;
+
   int charNum = 0;
+  int charLimit;
+
+  String currentString = "";
+
 
   for (int i = 0; i < min(positionsL.size(), positionsR.size()); i++) {
     /*   if ((i+1) % 4 == 0) {
@@ -90,43 +114,56 @@ void draw() {
      
      quad(x, y, x2, y, x2, y2, x, y2);
      }*/
-    /*    println(i + ": " + positionsL.get(i));
-     stroke(255);
-     fill(255, 0, 0);
-     ellipse(positionsL.get(i).x, positionsL.get(i).y, 10, 10);
-     
-     println(i + ": " + positionsR.get(i));
-     stroke(255);
-     fill(0, 255, 0);
-     ellipse(positionsR.get(i).x, positionsR.get(i).y, 10, 10);
-     
-     stroke(255, 255, 0);
-     strokeWeight(3);
-     line(positionsL.get(i).x, positionsL.get(i).y, positionsR.get(i).x, positionsR.get(i).y);
-     */
-    float currentWritingSpace =0;
+    //println(i + ": " + positionsL.get(i));
+    stroke(255, 255, 0);
+    strokeWeight(3);
+    line(positionsL.get(i).x, positionsL.get(i).y, positionsR.get(i).x, positionsR.get(i).y);
+
+    stroke(255);
+    fill(255, 0, 0);
+    ellipse(positionsL.get(i).x, positionsL.get(i).y, 10, 10);
+
+    //println(i + ": " + positionsR.get(i));
+    stroke(255);
+    fill(0, 255, 0);
+    ellipse(positionsR.get(i).x, positionsR.get(i).y, 10, 10);
+
+    currentWritingSpace =0;
+    totalWritingSpace += currentWritingSpace;
     currentWritingSpace = positionsR.get(i).x - positionsL.get(i).x;
-    totalWritingSpace += currentWritingSpace;    
 
-    String currentString = "";
+    charLimit = charNum  + int(currentWritingSpace / (totalWritingSpace / s.length())) -1; 
 
-    for (int j = charNum; j < s.length(); j++) {
+    currentString = "";
+
+    //calculate number of characters for the current width
+
+    for (int j = charNum; j < charLimit; j++) {
 
       char currentChar = s.charAt(j);
 
       if (textWidth(currentString) > currentWritingSpace) {
-
+        fill(255, 200, 200);
         text(currentString, positionsL.get(i).x, positionsL.get(i).y);
-      } else {
-        if (charNum > s.length() -10) { 
-          charNum = 0;
-        }
+        println("currentString: " + currentString);
+      } else {       
         currentString += str(currentChar);
-        charNum ++;
       }
     }
-    //  println("line width: " +  textWidth(currentString));
-    //  println("char number: " + charNum);
+
+    charNum = charLimit;
+    if (charNum >= s.length()-2) {
+      charNum = 0;
+    }
+
+
+    //println("line width: " +  textWidth(currentString));
+    //println("char number: " + charNum);
   }
-  // println("totalWritingSpace: " + totalWritingSpace);
+  //println("totalWritingSpace: " + totalWritingSpace);
+}
+
+
+void mouseMoved() {
+  // saveFrame();
 }
