@@ -4,6 +4,6 @@ experimento em processing para formatar texto de maneira dinâmica em qualquer f
 
 processing experiment to format text in a dinamic way on any shape 
 
-![Alt text](screenshot.png?raw=true "screenshot)
+![Image](screenshot.png)
 
 _Alberto Harres_
