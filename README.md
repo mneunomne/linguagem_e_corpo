@@ -6,4 +6,6 @@ processing experiment to format text in a dinamic way on any shape
 
 ![Image](screenshot.png)
 
+![Image](animation.gif)
+
 _Alberto Harres_
